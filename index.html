@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эхо Эйры: Великий Замысел</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Фоновый холст для частиц -->
+    <canvas id="bg" aria-hidden="true"></canvas>
+
+    <div class="app">
+        <!-- ШАПКА -->
+        <header class="header">
+            <div class="header-title">
+                <h1>ЭХО ЭЙРЫ</h1>
+                <span class="subtitle">— Великий Замысел —</span>
+            </div>
+            <div class="header-stats">
+                <div class="chip chip-souls">
+                    <span class="chip-label">Души</span>
+                    <span class="chip-value" id="soulsDisplay">0</span>
+                </div>
+                <div class="chip">
+                    <span class="chip-label">В секунду</span>
+                    <span class="chip-value" id="spsDisplay">0</span>
+                </div>
+                <div class="chip">
+                    <span class="chip-label">Множитель</span>
+                    <span class="chip-value" id="multDisplay">x1.0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid">
+            <!-- ЛЕВАЯ КОЛОНКА -->
+            <aside class="column left">
+                <section class="panel chronicle-panel">
+                    <h2 class="panel-title">Хроники Эйры</h2>
+                    <div class="chronicle" id="chronicle"></div>
+                </section>
+
+                <section class="panel">
+                    <h2 class="panel-title">Статистика</h2>
+                    <div class="stat-row"><span>Всего кликов</span><span id="statClicks">0</span></div>
+                    <div class="stat-row"><span>Критических ударов</span><span id="statCrits">0</span></div>
+                    <div class="stat-row"><span>Всего собрано душ</span><span id="statSouls">0</span></div>
+                    <div class="stat-row"><span>Квестов пройдено</span><span id="statQuests">0/15</span></div>
+                    <div class="stat-row"><span>Престижей</span><span id="statPrestige">0</span></div>
+                    <div class="stat-row"><span>Время в игре</span><span id="statTime">00:00:00</span></div>
+                </section>
+
+                <section class="panel">
+                    <h2 class="panel-title">Достижения <span class="panel-count" id="achCount">0/20</span></h2>
+                    <div class="achievements-list" id="achievementsList"></div>
+                </section>
+            </aside>
+
+            <!-- ЦЕНТРАЛЬНАЯ КОЛОНКА -->
+            <section class="column center">
+                <section class="panel vessel-panel">
+                    <div class="bar-head">
+                        <span class="bar-label">Сосуд Света</span>
+                        <span class="bar-value" id="vesselPct">0%</span>
+                    </div>
+                    <div class="bar vessel-bar">
+                        <div class="bar-fill vessel-fill" id="vesselFill"></div>
+                    </div>
+                </section>
+
+                <section class="panel buff-panel hidden" id="buffPanel">
+                    <div class="buff-line">✨ Бафф: <b id="buffText">x2 к клику</b> · <span id="buffTime">30с</span></div>
+                </section>
+
+                <section class="panel quest-panel">
+                    <div class="bar-head">
+                        <span class="bar-label">Активный квест</span>
+                        <span class="bar-value" id="questHeader">—</span>
+                    </div>
+                    <div class="bar quest-bar">
+                        <div class="bar-fill quest-fill" id="questFill"></div>
+                    </div>
+                </section>
+
+                <section class="panel combo-panel hidden" id="comboPanel">
+                    <div class="bar-head">
+                        <span class="bar-label combo-label">Комбо</span>
+                        <span class="bar-value combo-value" id="comboValue">x1.0</span>
+                    </div>
+                    <div class="bar combo-bar">
+                        <div class="bar-fill combo-fill" id="comboFill"></div>
+                    </div>
+                    <div class="melt-bar"><div class="melt-fill" id="comboMeltFill"></div></div>
+                </section>
+
+                <div class="orb">
+                    <div class="ring ring-a"></div>
+                    <div class="ring ring-b"></div>
+                    <div class="ring ring-c"></div>
+                    <div class="ring ring-d"></div>
+                    <button class="heal-btn" id="healBtn">
+                        <span class="heal-glyph">✦</span>
+                        <span class="heal-text">ИСЦЕЛИТЬ</span>
+                    </button>
+                </div>
+
+                <section class="panel stats-inline">
+                    <div class="inline-chip">
+                        <span class="ic-label">Сила клика</span>
+                        <b class="ic-value" id="clickPowerDisplay">1</b>
+                    </div>
+                    <div class="inline-chip">
+                        <span class="ic-label">Шанс крита</span>
+                        <b class="ic-value" id="critChanceDisplay">10%</b>
+                    </div>
+                    <div class="inline-chip">
+                        <span class="ic-label">Урон крита</span>
+                        <b class="ic-value" id="critMultDisplay">x5</b>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ПРАВАЯ КОЛОНКА: МАГАЗИН -->
+            <aside class="column right">
+                <section class="panel shop-panel">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="click">Клик</button>
+                        <button class="tab" data-tab="auto">Авто</button>
+                        <button class="tab" data-tab="magic">Магия</button>
+                        <button class="tab" data-tab="cycle">Цикл</button>
+                        <button class="tab" data-tab="artifacts">Артефакты</button>
+                        <button class="tab" data-tab="quests">Квесты</button>
+                    </div>
+
+                    <div class="tab-content active" id="tab-click"></div>
+                    <div class="tab-content" id="tab-auto"></div>
+
+                    <div class="tab-content" id="tab-magic">
+                        <div id="tab-magic-upgrades"></div>
+                        <div class="magic-card">
+                            <h3 class="magic-name">Вспышка Света</h3>
+                            <p class="magic-desc">Сила клика x10 на 10 секунд. Перезарядка 60 сек.</p>
+                            <button class="magic-btn" id="flashBtn">
+                                <span class="magic-label">Вспышка Света</span>
+                                <span class="magic-cd" id="flashCd">Готово</span>
+                                <span class="cd-overlay" id="flashOverlay"></span>
+                            </button>
+                        </div>
+                        <div class="magic-card">
+                            <h3 class="magic-name">Жертва</h3>
+                            <p class="magic-desc">Мгновенно дарует обильный урожай душ. Перезарядка 120 сек.</p>
+                            <button class="magic-btn" id="sacrificeBtn">
+                                <span class="magic-label">Жертва</span>
+                                <span class="magic-cd" id="sacrificeCd">Готово</span>
+                                <span class="cd-overlay" id="sacrificeOverlay"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-cycle">
+                        <div class="cycle-box">
+                            <div class="cycle-row"><span>Души в этом цикле</span><b id="runSouls">0</b></div>
+                            <div class="cycle-row"><span>Эхо при перерождении</span><b id="echoGainDisplay">0</b></div>
+                            <button class="prestige-btn" id="prestigeBtn">СОВЕРШИТЬ НОВЫЙ ЦИКЛ</button>
+                            <p class="hint">Доступно от 1000 душ. Сбрасывает души и улучшения. Артефакты и Эхо — вечны.</p>
+                        </div>
+                        <div class="cycle-box echo-box">
+                            <div class="cycle-row"><span>Эхо Ведьм</span><b id="echoHave">0</b></div>
+                            <div class="cycle-row"><span>Вечный множитель</span><b id="echoMultDisplay">x1.0</b></div>
+                            <button class="echo-btn" id="echoBtn">Вознести Эхо · <span id="echoCostDisplay">1</span></button>
+                            <p class="hint">Вечный глобальный множитель дохода: +0.1 за уровень.</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-artifacts"></div>
+
+                    <div class="tab-content" id="tab-quests">
+                        <div class="quest-card">
+                            <h3 class="quest-name" id="questName">—</h3>
+                            <p class="quest-desc" id="questDesc">—</p>
+                            <div class="bar quest-bar">
+                                <div class="bar-fill quest-fill" id="questFillBig"></div>
+                            </div>
+                            <div class="quest-progress" id="questProgressText">0 / 0</div>
+                            <div class="quest-reward" id="questReward">Награда: —</div>
+                        </div>
+                        <div class="quest-done">
+                            <h3 class="magic-name">Пройдено</h3>
+                            <div id="questHistory"></div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Слой всплывающего текста урона -->
+    <div class="float-layer" id="floatLayer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
